@@ -10,7 +10,7 @@ El detalle del problema, usuarios, objetivos y alcance está en el [análisis de
 
 - [Documentación: Actividad 1](#documentación-actividad-1)
 - [Estructura del repositorio](#estructura-del-repositorio)
-- [Autor](#autor)
+
 
 ## Documentación: Actividad 1
 
