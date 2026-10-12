@@ -19,19 +19,18 @@
 
 ## 2. Requisitos no funcionales (atributos de calidad)
 
-
-| ID | Atributo | Requisito |
+| ID | Atributo | Requisito | Meta propuesta |
 |---|---|---|---|
-| RNF-01 | Rendimiento | Consultar el estado de un pedido debe ser rápido |
-| RNF-02 | Escalabilidad / capacidad | Soportar la carga normal y picos de tráfico alto |
-| RNF-03 | Consistencia de datos | No vender stock que no existe; reserva sin colisiones entre canales |
-| RNF-04 | Disponibilidad | La operación no debe detenerse por fallas parciales |
-| RNF-05 | Seguridad y privacidad | Proteger datos personales y controlar el acceso por rol |
-| RNF-06 | Trazabilidad y auditoría | Registrar cada cambio de estado de pedido, stock y entrega |
-| RNF-07 | Resiliencia operativa | Tolerar pérdida de conexión del repartidor |
-| RNF-08 | Interoperabilidad | Contratos de API versionados e idempotencia en la recepción de pedidos |
-| RNF-09 | Evolución y mantenibilidad | Cambiar reglas de negocio sin tocar toda la aplicación |
-| RNF-10 | Observabilidad | Detectar y diagnosticar fallas con rapidez |
+| RNF-01 | Rendimiento | Consultar el estado de un pedido debe ser rápido | p95 < 2 s |
+| RNF-02 | Escalabilidad / capacidad | Soportar la carga normal y picos de tráfico alto | 1.000 pedidos/hora en operación normal; diseño para 3 veces esa carga en picos |
+| RNF-03 | Consistencia de datos | No vender stock que no existe; reserva sin colisiones entre canales | 0 sobreventas |
+| RNF-04 | Disponibilidad | La operación no debe detenerse por fallas parciales | 99,5 % mensual en el núcleo; las fallas de servicios externos no detienen el flujo |
+| RNF-05 | Seguridad y privacidad | Proteger datos personales y controlar el acceso por rol | Cifrado en tránsito y en reposo; 100 % de accesos no autorizados rechazados y registrados |
+| RNF-06 | Trazabilidad y auditoría | Registrar cada cambio de estado de pedido, stock y entrega | 100 % de cambios con fecha, hora y responsable |
+| RNF-07 | Resiliencia operativa | Tolerar pérdida de conexión del repartidor | Sincronización sin duplicados al reconectar, en < 1 min |
+| RNF-08 | Interoperabilidad | Contratos de API versionados e idempotencia en la recepción de pedidos | 0 pedidos duplicados ante reenvíos |
+| RNF-09 | Evolución y mantenibilidad | Cambiar reglas de negocio sin tocar toda la aplicación | Un cambio de regla afecta solo a un módulo |
+| RNF-10 | Observabilidad | Detectar y diagnosticar fallas con rapidez | Registros y métricas por módulo; alertas ante errores de integración |
 
 ## 3. Restricciones
 
