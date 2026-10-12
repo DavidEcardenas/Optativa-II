@@ -1,27 +1,63 @@
 # LastMile: sistema operativo logístico
 
-## Resumen ejecutivo
+## Resumen del problema
 
-LastMile es un sistema operativo logístico que centraliza los estados de pedidos de múltiples canales de venta, da visibilidad del inventario consolidado de los nodos distribuidos y automatiza la asignación y seguimiento de las rutas de última milla. Su meta es reducir un 35% los errores operativos por duplicación e inconsistencia de datos.
+La operación actual funciona en silos: cada canal de venta maneja su propio stock y la coordinación entre almacén, repartidor y soporte es manual. Sin una fuente única de verdad no se conoce el estado real de un paquete y se vende sin stock disponible, lo que genera entregas fallidas, clientes sin información y soporte sobrecargado.
 
-El detalle del problema, usuarios, objetivos y alcance está en el [análisis del problema](./docs/actividad-1/01-analisis-del-problema.md).
+LastMile centraliza los estados de pedidos de múltiples canales, da visibilidad del inventario consolidado y automatiza la asignación y seguimiento de las rutas de última milla. Su meta es reducir un 35% los errores operativos por duplicación e inconsistencia de datos.
 
-## Tabla de contenido
 
-- [Documentación: Actividad 1](#documentación-actividad-1)
-- [Estructura del repositorio](#estructura-del-repositorio)
-- [Autor](#autor)
 
-## Documentación: Actividad 1
+## Requisitos prioritarios
 
-Carpeta: [`/docs/actividad-1`](./docs/actividad-1)
+Catálogo completo: 14 requisitos funcionales y 10 atributos de calidad. Los que más condicionan la arquitectura son:
 
-| # | Documento | Contenido |
+| Prioridad | Requisito | Meta verificable |
 |---|---|---|
-| 1 | [Análisis del problema](./docs/actividad-1/01-analisis-del-problema.md) | Problema inicial, usuarios, objetivos, alcance y análisis del problema |
-| 2 | [Supuestos](./docs/actividad-1/02-supuestos.md) | Supuestos, lo que no se sabe y lo que falta confirmar |
-| 3 | [Diagrama de contexto](./docs/actividad-1/03-diagrama-de-contexto.md) | Diagrama de contexto y flujos principales de información |
-| 4 | [Decisiones y riesgos](./docs/actividad-1/04-decisiones-y-riesgos.md) | Registro de decisiones iniciales y riesgos |
+| 1 | Consistencia de inventario y reserva de stock (RNF-03, RF-06) | 0 sobreventas ante reservas simultáneas |
+| 2 | Estado único del pedido y trazabilidad (RF-02, RNF-06) | Consulta p95 < 2 s; 100 % de cambios auditados |
+| 3 | Interoperabilidad con ERP/CRM, pasarela y servicios externos (RNF-08) | 0 pedidos duplicados ante reenvíos |
+| 4 | Disponibilidad y capacidad ante picos (RNF-04, RNF-02) | Una falla externa no detiene pedidos; 3 veces la carga normal sin perder pedidos |
+| 5 | Evolución por módulos (RNF-09) | Un cambio de regla afecta a un solo módulo |
+| 6 | Seguridad de datos personales (RNF-05) | Cifrado y acceso por rol |
+
+
+
+## Decisión arquitectónica
+
+**Monolito modular con límites de dominio claros**, desplegado como una sola unidad, con los módulos Pedidos, Inventario, Entregas, Incidencias, Notificaciones e Integraciones. Cada módulo es dueño de sus datos y se comunica con los demás solo por interfaces o eventos internos.
+
+| Alternativa | Puntaje ponderado | Resultado |
+|---|---|---|
+| A. Monolito modular | 4,35 | **Elegida** |
+| B. Servicios distribuidos por dominio | 2,75 | Descartada por ahora |
+| C. Monolito por capas | 3,95 | Descartada |
+
+**Por qué:** la reserva de stock puede resolverse con una transacción local, la operación es más simple y barata, y los límites por dominio permiten extraer servicios más adelante si el volumen lo justifica. Detalle y trade-offs.
+
+
+## Documentación
+
+### Comprender el problema
+
+| Documento | Contenido |
+|---|---|
+| [Análisis del problema](./docs/actividad-1/01-analisis-del-problema.md) | Problema, usuarios, objetivos, alcance y consecuencias |
+| [Supuestos](./docs/actividad-1/02-supuestos.md) | Supuestos, incógnitas y puntos por confirmar |
+| [Diagrama de contexto](./docs/actividad-1/03-diagrama-de-contexto.md) | Contexto y flujos de información |
+| [Decisiones y riesgos](./docs/actividad-1/04-decisiones-y-riesgos.md) | Decisiones iniciales y riesgos |
+
+### Requisitos y decisión estructural
+
+| Documento | Contenido |
+|---|---|
+| [Catálogo de requisitos](./docs/actividad-2/01-catalogo-de-requisitos.md) | Requisitos funcionales, atributos de calidad y restricciones |
+| [Matriz de priorización](./docs/actividad-2/02-matriz-de-priorizacion.md) | Prioridad, impacto y complejidad; drivers arquitectónicos |
+| [Escenarios de calidad](./docs/actividad-2/03-escenarios-de-calidad.md) | 10 escenarios con medidas concretas |
+| [Comparación de alternativas](./docs/actividad-2/04-comparacion-de-alternativas.md) | Tres alternativas con criterios ponderados |
+| [ADR-001](./docs/actividad-2/05-adr-001-estructura-del-sistema.md) | Decisión, alternativas, justificación, riesgos y trade-offs |
+| [Criterios de verificación](./docs/actividad-2/06-criterios-de-verificacion.md) | Criterios verificables de la decisión |
+| [Guion del video](./docs/actividad-2/07-guion-video.md) | Apoyo para la sustentación |
 
 ## Estructura del repositorio
 
@@ -29,10 +65,16 @@ Carpeta: [`/docs/actividad-1`](./docs/actividad-1)
 .
 ├── README.md
 └── docs/
-    └── actividad-1/
-        ├── 01-analisis-del-problema.md
-        ├── 02-supuestos.md
-        ├── 03-diagrama-de-contexto.md
-        └── 04-decisiones-y-riesgos.md
+    ├── actividad-1/
+    │   ├── 01-analisis-del-problema.md
+    │   ├── 02-supuestos.md
+    │   ├── 03-diagrama-de-contexto.md
+    │   └── 04-decisiones-y-riesgos.md
+    └── actividad-2/
+        ├── 01-catalogo-de-requisitos.md
+        ├── 02-matriz-de-priorizacion.md
+        ├── 03-escenarios-de-calidad.md
+        ├── 04-comparacion-de-alternativas.md
+        ├── 05-adr-001-estructura-del-sistema.md
+        └── 06-criterios-de-verificacion.md
 ```
-
