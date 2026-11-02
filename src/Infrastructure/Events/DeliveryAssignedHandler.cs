@@ -1,4 +1,5 @@
 using LastMile.Application.Entregas;
+using Microsoft.Extensions.Logging;
 
 namespace LastMile.Infrastructure.Events;
 
@@ -11,8 +12,6 @@ public sealed class DeliveryAssignedHandler
 
     public Task HandleAsync(DeliveryAssigned evt, CancellationToken ct)
     {
-        // Aquí iría la llamada al sistema de notificaciones.
-        // Por ahora solo registramos para demostrar el flujo.
         _logger.LogInformation(
             "Delivery {DeliveryId} assigned to courier {CourierId} at {OccurredAt}",
             evt.DeliveryId, evt.CourierId, evt.OccurredAt);

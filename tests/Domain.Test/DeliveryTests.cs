@@ -19,7 +19,6 @@ public class DeliveryTests
         return delivery;
     }
 
-    // QS-ASG-01
     [Fact]
     public void AssignCourier_FromPrepared_ChangesStatusToAsignada()
     {
@@ -33,7 +32,6 @@ public class DeliveryTests
         Assert.NotNull(delivery.AssignedAt);
     }
 
-    // QS-ASG-02 (INV-01)
     [Fact]
     public void AssignCourier_WhenAlreadyAssigned_Throws()
     {
@@ -46,7 +44,6 @@ public class DeliveryTests
         Assert.Equal("Delivery already assigned", ex.Message);
     }
 
-    // QS-ASG-07 (INV-06)
     [Fact]
     public void AssignCourier_WhenDelivered_Throws()
     {
@@ -61,7 +58,6 @@ public class DeliveryTests
         Assert.Equal("Cannot assign a closed delivery", ex.Message);
     }
 
-    // Transición inválida
     [Fact]
     public void AssignCourier_FromPendiente_Throws()
     {

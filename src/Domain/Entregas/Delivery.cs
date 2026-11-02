@@ -2,13 +2,16 @@ namespace LastMile.Domain.Entregas;
 
 public sealed class Delivery
 {
-    public DeliveryId Id { get; }
-    public OrderId OrderId { get; }
-    public DeliveryAddress Address { get; }
-    public DeliveryWindow Window { get; }
+    public DeliveryId Id { get; private set; } = default!;
+    public OrderId OrderId { get; private set; } = default!;
+    public DeliveryAddress Address { get; private set; } = default!;
+    public DeliveryWindow Window { get; private set; } = default!;
     public DeliveryStatus Status { get; private set; }
     public CourierId? CourierId { get; private set; }
     public DateTime? AssignedAt { get; private set; }
+
+    // Constructor vacío para EF Core
+    private Delivery() { }
 
     public Delivery(
         DeliveryId id,
@@ -23,9 +26,6 @@ public sealed class Delivery
         Status = DeliveryStatus.Pendiente;
     }
 
-    /// <summary>
-    /// Prepara la entrega para asignación. Transición Pendiente -> Preparada.
-    /// </summary>
     public void MarkAsPrepared()
     {
         if (Status != DeliveryStatus.Pendiente)
@@ -35,19 +35,15 @@ public sealed class Delivery
         Status = DeliveryStatus.Preparada;
     }
 
-    /// <summary>
-    /// Asigna un repartidor a la entrega.
-    /// Protege INV-01 (no doble asignación) e INV-06 (no reasignar terminales).
-    /// </summary>
     public void AssignCourier(CourierId courierId, string assignedBy)
     {
+        // INV-06: no reasignar entregas cerradas (PRIMERO)
+        if (Status is DeliveryStatus.Entregada or DeliveryStatus.Fallida)
+            throw new DomainException("Cannot assign a closed delivery");
+
         // INV-01: no doble asignación
         if (CourierId is not null)
             throw new DomainException("Delivery already assigned");
-
-        // INV-06: no reasignar entregas cerradas
-        if (Status is DeliveryStatus.Entregada or DeliveryStatus.Fallida)
-            throw new DomainException("Cannot assign a closed delivery");
 
         // Transición válida: solo desde Preparada
         if (Status != DeliveryStatus.Preparada)
@@ -63,9 +59,6 @@ public sealed class Delivery
         Status = DeliveryStatus.Asignada;
     }
 
-    /// <summary>
-    /// Inicia la ruta. Transición Asignada -> EnRuta.
-    /// </summary>
     public void StartRoute()
     {
         if (Status != DeliveryStatus.Asignada)
@@ -75,9 +68,6 @@ public sealed class Delivery
         Status = DeliveryStatus.EnRuta;
     }
 
-    /// <summary>
-    /// Confirma la entrega al cliente. Transición EnRuta -> Entregada.
-    /// </summary>
     public void ConfirmDelivery()
     {
         if (Status != DeliveryStatus.EnRuta)
@@ -87,9 +77,6 @@ public sealed class Delivery
         Status = DeliveryStatus.Entregada;
     }
 
-    /// <summary>
-    /// Reporta una incidencia. Transición EnRuta -> ConIncidencia.
-    /// </summary>
     public void ReportIncident()
     {
         if (Status != DeliveryStatus.EnRuta)
@@ -99,9 +86,6 @@ public sealed class Delivery
         Status = DeliveryStatus.ConIncidencia;
     }
 
-    /// <summary>
-    /// Resuelve una incidencia. Transición ConIncidencia -> EnRuta.
-    /// </summary>
     public void ResolveIncident()
     {
         if (Status != DeliveryStatus.ConIncidencia)
@@ -111,9 +95,6 @@ public sealed class Delivery
         Status = DeliveryStatus.EnRuta;
     }
 
-    /// <summary>
-    /// Marca como fallida. Solo desde ConIncidencia.
-    /// </summary>
     public void MarkAsFailed()
     {
         if (Status != DeliveryStatus.ConIncidencia)

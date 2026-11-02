@@ -50,7 +50,5 @@ public sealed class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             w.Property(x => x.Start).HasColumnName("window_start");
             w.Property(x => x.End).HasColumnName("window_end");
         });
-
-        builder.Ignore(d => d.DomainEvents);
     }
 }

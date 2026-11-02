@@ -15,7 +15,6 @@ public class AssignCourierEndpointTests : IClassFixture<LastMileWebAppFactory>
     public AssignCourierEndpointTests(LastMileWebAppFactory factory)
         => _factory = factory;
 
-    // Camino feliz
     [Fact]
     public async Task Post_ValidRequest_ReturnsOkAndPersists()
     {
@@ -37,7 +36,6 @@ public class AssignCourierEndpointTests : IClassFixture<LastMileWebAppFactory>
         Assert.Equal(DeliveryStatus.Asignada, saved!.Status);
     }
 
-    // Escenario de error: entrega inexistente
     [Fact]
     public async Task Post_UnknownDelivery_ReturnsNotFound()
     {
@@ -50,7 +48,6 @@ public class AssignCourierEndpointTests : IClassFixture<LastMileWebAppFactory>
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    // Escenario de error: RequestedBy vacío
     [Fact]
     public async Task Post_EmptyRequestedBy_ReturnsBadRequest()
     {

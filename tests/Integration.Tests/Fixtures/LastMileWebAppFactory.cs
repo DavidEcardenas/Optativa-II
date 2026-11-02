@@ -1,9 +1,11 @@
 using LastMile.Application.Entregas.Ports;
 using LastMile.Domain.Entregas;
 using LastMile.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace LastMile.Integration.Tests.Fixtures;
 
