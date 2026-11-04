@@ -37,6 +37,8 @@ Catálogo completo: 14 requisitos funcionales y 10 atributos de calidad. Los que
 
 La Actividad 3 continúa esa decisión con un **ADR-002** que fija el diseño del dominio del módulo Entregas: `Delivery` como aggregate root, invariantes protegidas por la entidad y los casos de uso, y puertos definidos por la Aplicación. Ver [ADR-002](./docs/actividad-3/08-adr-002-dominio-entregas.md).
 
+La Actividad 4 materializa ese diseño en un **vertical slice ejecutable** y documenta las decisiones de persistencia y adaptadores en el **ADR-003**. Ver [ADR-003](./docs/actividad-4/06-adr-003-persistencia-y-adaptadores.md).
+
 
 
 ## Documentación
@@ -75,6 +77,17 @@ La Actividad 3 continúa esa decisión con un **ADR-002** que fija el diseño de
 | [C4 actualizado](./docs/actividad-3/07-c4-actualizado.md) | Niveles 1, 2 y 3 con el módulo Entregas |
 | [ADR-002](./docs/actividad-3/08-adr-002-dominio-entregas.md) | Decisión de diseño del dominio del módulo Entregas |
 
+### Construcción y validación
+
+| Documento | Contenido |
+|---|---|
+| [Plan de implementación](./docs/actividad-4/01-plan-implementacion.md) | Vertical slice y capas conectadas |
+| [Riesgos y mitigaciones](./docs/actividad-4/02-riesgos-y-mitigaciones.md) | Riesgos operativos y de seguridad con evidencia |
+| [Observabilidad](./docs/actividad-4/03-observabilidad.md) | Señales definidas y datos sensibles excluidos |
+| [Resultados de pruebas](./docs/actividad-4/04-resultados-pruebas.md) | Evidencia de ejecución de los 38 tests |
+| [Riesgos residuales](./docs/actividad-4/05-riesgos-residuales-y-proximos-pasos.md) | Riesgos abiertos y próximos pasos priorizados |
+| [ADR-003](./docs/actividad-4/06-adr-003-persistencia-y-adaptadores.md) | Decisión de persistencia y adaptadores |
+
 
 
 ## Estructura del repositorio
@@ -83,14 +96,25 @@ La Actividad 3 continúa esa decisión con un **ADR-002** que fija el diseño de
 .
 ├── README.md
 ├── Architecture.md
+├── .gitignore
 ├── src/
 │   ├── Domain/
 │   │   └── Entregas/
-│   └── Application/
-│       └── Entregas/
+│   ├── Application/
+│   │   └── Entregas/
+│   ├── Infrastructure/
+│   │   ├── Persistence/
+│   │   ├── External/
+│   │   └── Events/
+│   └── Api/
+│       ├── Controllers/
+│       ├── Dtos/
+│       └── Middleware/
 ├── tests/
-│   ├── Domain.Tests/
-│   └── Application.Tests/
+│   ├── Domain.Test/
+│   ├── Application.Tests/
+│   ├── Integration.Tests/
+│   └── Architecture.Tests/
 └── docs/
     ├── actividad-1/
     │   ├── 01-analisis-del-problema.md
@@ -104,31 +128,38 @@ La Actividad 3 continúa esa decisión con un **ADR-002** que fija el diseño de
     │   ├── 04-comparacion-de-alternativas.md
     │   ├── 05-adr-001-estructura-del-sistema.md
     │   └── 06-criterios-de-verificacion.md
-    └── actividad-3/
-        ├── 01-flujo-de-negocio.md
-        ├── 02-lenguaje-ubicuo.md
-        ├── 03-modelo-de-dominio.md
-        ├── 04-invariantes-y-escenarios.md
-        ├── 05-bounded-contexts.md
-        ├── 06-casos-de-uso/
-        │   ├── README.md
-        │   ├── 06.1-contrato-de-aplicacion.md
-        │   ├── 06.2-flujo-del-caso-de-uso.md
-        │   ├── 06.3-implementacion-del-caso-de-uso.md
-        │   ├── 06.4-puertos.md
-        │   ├── 06.5-contratos-de-puertos.md
-        │   ├── 06.6-adaptadores.md
-        │   ├── 06.7-direccion-de-dependencias.md
-        │   └── 06.8-otros-casos-de-uso.md
-        ├── 07-c4-actualizado.md
-        └── 08-adr-002-dominio-entregas.md
+    ├── actividad-3/
+    │   ├── 01-flujo-de-negocio.md
+    │   ├── 02-lenguaje-ubicuo.md
+    │   ├── 03-modelo-de-dominio.md
+    │   ├── 04-invariantes-y-escenarios.md
+    │   ├── 05-bounded-contexts.md
+    │   ├── 06-casos-de-uso/
+    │   │   ├── README.md
+    │   │   ├── 06.1-contrato-de-aplicacion.md
+    │   │   ├── 06.2-flujo-del-caso-de-uso.md
+    │   │   ├── 06.3-implementacion-del-caso-de-uso.md
+    │   │   ├── 06.4-puertos.md
+    │   │   ├── 06.5-contratos-de-puertos.md
+    │   │   ├── 06.6-adaptadores.md
+    │   │   ├── 06.7-direccion-de-dependencias.md
+    │   │   └── 06.8-otros-casos-de-uso.md
+    │   ├── 07-c4-actualizado.md
+    │   └── 08-adr-002-dominio-entregas.md
+    └── actividad-4/
+        ├── 01-plan-implementacion.md
+        ├── 02-riesgos-y-mitigaciones.md
+        ├── 03-observabilidad.md
+        ├── 04-resultados-pruebas.md
+        ├── 05-riesgos-residuales-y-proximos-pasos.md
+        └── 06-adr-003-persistencia-y-adaptadores.md
 ```
 
 
 
 ## Código
 
-El diseño de dominio de la Actividad 3 se materializa en las carpetas `src/` y `tests/`, siguiendo Clean Architecture dentro del módulo Entregas.
+El vertical slice de la Actividad 4 conecta las cuatro capas de Clean Architecture dentro del módulo Entregas: entrada HTTP, aplicación, dominio e infraestructura.
 
 ### Estructura de código
 
@@ -144,39 +175,128 @@ src/
 │       ├── DeliveryAddress.cs
 │       ├── DeliveryWindow.cs
 │       └── DomainException.cs
-└── Application/
-    └── Entregas/
-        ├── AssignCourierUseCase.cs
-        ├── AssignCourierCommand.cs
-        ├── AssignCourierResult.cs
-        ├── DeliveryAssigned.cs
-        └── Ports/
-            ├── IDeliveryRepository.cs
-            ├── ICourierAvailabilityPort.cs
-            ├── IRouteCapacityPort.cs
-            ├── IStockReservationPort.cs
-            └── IEventPublisher.cs
+├── Application/
+│   └── Entregas/
+│       ├── AssignCourierUseCase.cs
+│       ├── AssignCourierCommand.cs
+│       ├── AssignCourierResult.cs
+│       ├── DeliveryAssigned.cs
+│       └── Ports/
+│           ├── IDeliveryRepository.cs
+│           ├── ICourierAvailabilityPort.cs
+│           ├── IRouteCapacityPort.cs
+│           ├── IStockReservationPort.cs
+│           └── IEventPublisher.cs
+├── Infrastructure/
+│   ├── Persistence/
+│   │   ├── LastMileDbContext.cs
+│   │   ├── EfDeliveryRepository.cs
+│   │   ├── Configurations/
+│   │   │   └── DeliveryConfiguration.cs
+│   │   └── Migrations/
+│   ├── External/
+│   │   ├── HttpCourierAvailabilityAdapter.cs
+│   │   ├── HttpRouteCapacityAdapter.cs
+│   │   └── HttpStockReservationAdapter.cs
+│   └── Events/
+│       ├── InMemoryEventPublisher.cs
+│       └── DeliveryAssignedHandler.cs
+└── Api/
+    ├── Program.cs
+    ├── appsettings.json
+    ├── Controllers/
+    │   └── DeliveriesController.cs
+    ├── Dtos/
+    │   └── AssignCourierRequest.cs
+    └── Middleware/
+        └── ExceptionHandlingMiddleware.cs
 
 tests/
-├── Domain.Tests/
+├── Domain.Test/
 │   ├── DeliveryTests.cs
 │   ├── DeliveryAddressTests.cs
 │   └── DeliveryWindowTests.cs
-└── Application.Tests/
-    ├── AssignCourierUseCaseTests.cs
-    └── Fakes/
-        ├── FakeDeliveryRepository.cs
-        ├── FakeCourierAvailabilityPort.cs
-        ├── FakeRouteCapacityPort.cs
-        ├── FakeStockReservationPort.cs
-        └── FakeEventPublisher.cs
+├── Application.Tests/
+│   ├── AssignCourierUseCaseTests.cs
+│   └── Fakes/
+│       ├── FakeDeliveryRepository.cs
+│       ├── FakeCourierAvailabilityPort.cs
+│       ├── FakeRouteCapacityPort.cs
+│       ├── FakeStockReservationPort.cs
+│       └── FakeEventPublisher.cs
+├── Integration.Tests/
+│   ├── AssignCourierEndpointTests.cs
+│   └── Fixtures/
+│       └── LastMileWebAppFactory.cs
+└── Architecture.Tests/
+    └── LayerDependencyTests.cs
 ```
 
-### Cómo correr los tests
+### Cómo ejecutar el proyecto
+
+**Requisitos previos:** Docker, .NET 8 SDK, `dotnet-ef`.
+
+1. Levantar PostgreSQL:
+
+   ```bash
+   docker run --name lastmile-db \
+     -e POSTGRES_USER=lastmile \
+     -e POSTGRES_PASSWORD=lastmile \
+     -e POSTGRES_DB=lastmile \
+     -p 5432:5432 \
+     -d postgres:16
+   ```
+
+2. Aplicar migraciones:
+
+   ```bash
+   dotnet ef database update \
+     --project src/Infrastructure \
+     --startup-project src/Api
+   ```
+
+3. Ejecutar la API:
+
+   ```bash
+   dotnet run --project src/Api
+   ```
+
+   La API queda escuchando en `http://localhost:5000`.
+
+4. Probar el endpoint:
+
+   ```bash
+   curl -X POST http://localhost:5000/deliveries/{id}/assign-courier \
+     -H "Content-Type: application/json" \
+     -d '{"courierId":"...","requestedBy":"admin@lastmile.com"}'
+   ```
+
+5. Correr los tests:
+
+   ```bash
+   dotnet test
+   ```
+
+### Modo demo
+
+Si `appsettings.json` no tiene configurada la sección `ExternalApis`, la API usa dobles de los puertos externos que devuelven `true`. Esto permite probar el flujo sin los servicios reales de repartidores, rutas e inventario. Al configurar las URLs, los adaptadores HTTP reales se activan automáticamente. Ver [ADR-003](./docs/actividad-4/06-adr-003-persistencia-y-adaptadores.md).
+
+### Resultados de pruebas
 
 ```bash
 dotnet test
 ```
+
+```
+Passed!  - Failed: 0, Passed: 38, Skipped: 0, Total: 38
+```
+
+| Suite | Tests | Resultado |
+|---|---|---|
+| `LastMile.Domain.Tests` | 23 | ✅ |
+| `LastMile.Application.Tests` | 7 | ✅ |
+| `LastMile.Architecture.Tests` | 4 | ✅ |
+| `LastMile.Integration.Tests` | 4 | ✅ |
 
 ### Invariantes cubiertas por los tests
 
@@ -188,4 +308,22 @@ dotnet test
 | INV-04 (disponibilidad) | `Execute_WhenCourierNotAvailable_Throws` |
 | INV-06 (no reasignar terminales) | `AssignCourier_WhenDelivered_Throws` |
 
+### Casos de error cubiertos
+
+| Caso | Código HTTP | Test / evidencia |
+|---|---|---|
+| Entrega inexistente | 404 | `Post_UnknownDelivery_ReturnsNotFound` |
+| `RequestedBy` vacío | 400 | `Post_EmptyRequestedBy_ReturnsBadRequest` |
+| Doble asignación | 409 | Prueba manual con `curl` y `AssignCourier_WhenAlreadyAssigned_Throws` |
+
+
+
+## Estado de las actividades
+
+| Actividad | Estado | Entregable |
+|---|---|---|
+| Actividad 1 | Completada | Análisis del problema, supuestos, contexto y decisiones iniciales |
+| Actividad 2 | Completada | Catálogo, escenarios, comparación, ADR-001 y criterios de verificación |
+| Actividad 3 | Completada | Diseño de dominio (ADR-002), casos de uso, puertos, adaptadores, C4 y tests |
+| Actividad 4 | Completada | Vertical slice, persistencia, integración, pruebas, riesgos y defensa |
 
